@@ -22,14 +22,14 @@ namespace {
 
 #if defined(__AVR__)
 // pin settings for AVR based Arduino like Blinkenlighty, Uno or Nano
-const uint8_t dcf77_analog_sample_pin = 5;
-const uint8_t dcf77_sample_pin = 19;  // A5 == D19 for standard Arduinos
-const uint8_t dcf77_inverted_samples = 1;
-const uint8_t dcf77_analog_samples = 0;
-// const uint8_t dcf77_pin_mode = INPUT;  // disable internal pull up
-const uint8_t dcf77_pin_mode = INPUT_PULLUP;  // enable internal pull up
+const uint8_t WWVB_analog_sample_pin = 5;
+const uint8_t WWVB_sample_pin = 19;  // A5 == D19 for standard Arduinos
+const uint8_t WWVB_inverted_samples = 1;
+const uint8_t WWVB_analog_samples = 0;
+// const uint8_t WWVB_pin_mode = INPUT;  // disable internal pull up
+const uint8_t WWVB_pin_mode = INPUT_PULLUP;  // enable internal pull up
 
-const uint8_t dcf77_monitor_led = 18; // A4 == D18 for standard Arduinos
+const uint8_t WWVB_monitor_led = 18; // A4 == D18 for standard Arduinos
 
 const uint8_t lower_output_led = 2;
 const uint8_t upper_output_led = 17;
@@ -44,13 +44,13 @@ uint8_t ledpin(const int8_t led) {
 // is only required for the Blinkenlighty or Arduino Uno + Blinkenlight Shield.
 // For the Due any free pin may be used in digital mode.
 
-const uint8_t dcf77_sample_pin = 53;
-const uint8_t dcf77_inverted_samples = 0;
+const uint8_t WWVB_sample_pin = 53;
+const uint8_t WWVB_inverted_samples = 0;
 
-// const uint8_t dcf77_pin_mode = INPUT;  // disable internal pull up
-const uint8_t dcf77_pin_mode = INPUT_PULLUP;  // enable internal pull up
+// const uint8_t WWVB_pin_mode = INPUT;  // disable internal pull up
+const uint8_t WWVB_pin_mode = INPUT_PULLUP;  // enable internal pull up
 
-const uint8_t dcf77_monitor_led = 18;
+const uint8_t WWVB_monitor_led = 18;
 
 const uint8_t lower_output_led = 2;
 const uint8_t upper_output_led = 17;
@@ -66,7 +66,7 @@ uint8_t ledpin(const int8_t led) {
 #define dedicated_module_support 1
 const uint8_t gnd_pin  = 51;
 const uint8_t pon_pin  = 51;  // connect pon to ground !!!
-const uint8_t data_pin = dcf77_sample_pin;  // 53
+const uint8_t data_pin = WWVB_sample_pin;  // 53
 const uint8_t vcc_pin  = 49;
 #endif
 
@@ -110,13 +110,13 @@ const uint8_t vcc_pin  = 49;
 uint8_t sample_input_pin() {
     const uint8_t sampled_data =
     #if defined(__AVR__)
-        dcf77_inverted_samples ^ (dcf77_analog_samples? (analogRead(dcf77_analog_sample_pin) > 200):
-                                                        digitalRead(dcf77_sample_pin));
+        WWVB_inverted_samples ^ (WWVB_analog_samples? (analogRead(WWVB_analog_sample_pin) > 200):
+                                                        digitalRead(WWVB_sample_pin));
     #else
-        dcf77_inverted_samples ^ digitalRead(dcf77_sample_pin);
+        WWVB_inverted_samples ^ digitalRead(WWVB_sample_pin);
     #endif
 
-    digitalWrite(ledpin(dcf77_monitor_led), sampled_data);
+    digitalWrite(ledpin(WWVB_monitor_led), sampled_data);
     return sampled_data;
 }
 
@@ -176,9 +176,9 @@ void setup() {
     digitalWrite(vcc_pin, HIGH);
     #endif
 
-    pinMode(dcf77_sample_pin, dcf77_pin_mode);
+    pinMode(WWVB_sample_pin, WWVB_pin_mode);
 
-    pinMode(dcf77_monitor_led, OUTPUT);
+    pinMode(WWVB_monitor_led, OUTPUT);
     for (uint8_t led = lower_output_led; led <= upper_output_led; ++led) {
         pinMode(ledpin(led), OUTPUT);
         digitalWrite(ledpin(led), LOW);

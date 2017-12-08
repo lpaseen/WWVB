@@ -18,24 +18,24 @@
 
 
 // Resources:
-//     http://www.obbl-net.de/dcf77.html
-//     http://home.arcor.de/armin.diehl/dcf77usb/
+//     http://www.obbl-net.de/WWVB.html
+//     http://home.arcor.de/armin.diehl/WWVBusb/
 //     http://www.meinbergglobal.com/english/info/ntp.htm#cfg
 //     http://www.meinbergglobal.com/download/ntp/docs/ntp_cheat_sheet.pdf
 //     http://www.meinberg.de/german/specs/timestr.htm
 //     http://www.eecis.udel.edu/~mills/ntp/html/parsedata.html
 
-#include <dcf77.h>
+#include <WWVB.h>
 
-const uint8_t dcf77_analog_sample_pin = 5;
-const uint8_t dcf77_sample_pin = A5;  // A5 == d19
-const uint8_t dcf77_inverted_samples = 1;
-const uint8_t dcf77_analog_samples = 1;
-// const uint8_t dcf77_pin_mode = INPUT;  // disable internal pull up
-const uint8_t dcf77_pin_mode = INPUT_PULLUP;  // enable internal pull up
-const uint8_t dcf77_signal_good_indicator_pin = 13;
+const uint8_t WWVB_analog_sample_pin = 5;
+const uint8_t WWVB_sample_pin = A5;  // A5 == d19
+const uint8_t WWVB_inverted_samples = 1;
+const uint8_t WWVB_analog_samples = 1;
+// const uint8_t WWVB_pin_mode = INPUT;  // disable internal pull up
+const uint8_t WWVB_pin_mode = INPUT_PULLUP;  // enable internal pull up
+const uint8_t WWVB_signal_good_indicator_pin = 13;
 
-const uint8_t dcf77_monitor_pin = A4;  // A4 == d18
+const uint8_t WWVB_monitor_pin = A4;  // A4 == d18
 
 #if defined(__AVR__)
     #define print(...)   Serial.print(__VA_ARGS__)
@@ -47,10 +47,10 @@ const uint8_t dcf77_monitor_pin = A4;  // A4 == d18
 
 uint8_t sample_input_pin() {
     const uint8_t sampled_data =
-        dcf77_inverted_samples ^ (dcf77_analog_samples? (analogRead(dcf77_analog_sample_pin) > 200)
-                                                      : digitalRead(dcf77_sample_pin));
+        WWVB_inverted_samples ^ (WWVB_analog_samples? (analogRead(WWVB_analog_sample_pin) > 200)
+                                                      : digitalRead(WWVB_sample_pin));
 
-    digitalWrite(dcf77_monitor_pin, sampled_data);
+    digitalWrite(WWVB_monitor_pin, sampled_data);
     return sampled_data;
 }
 
@@ -65,21 +65,21 @@ void setup() {
     println(F("(c) Udo Klein 2016"));
     println(F("www.blinkenlight.net"));
     println();
-    print(F("Sample Pin:      ")); println(dcf77_sample_pin);
-    print(F("Sample Pin Mode: ")); println(dcf77_pin_mode);
-    print(F("Inverted Mode:   ")); println(dcf77_inverted_samples);
-    print(F("Analog Mode:     ")); println(dcf77_analog_samples);
-    print(F("Monitor Pin:     ")); println(dcf77_monitor_pin);
-    print(F("Signal Good Indicator Pin: ")); println(dcf77_signal_good_indicator_pin);
+    print(F("Sample Pin:      ")); println(WWVB_sample_pin);
+    print(F("Sample Pin Mode: ")); println(WWVB_pin_mode);
+    print(F("Inverted Mode:   ")); println(WWVB_inverted_samples);
+    print(F("Analog Mode:     ")); println(WWVB_analog_samples);
+    print(F("Monitor Pin:     ")); println(WWVB_monitor_pin);
+    print(F("Signal Good Indicator Pin: ")); println(WWVB_signal_good_indicator_pin);
     println();
     println();
     println(F("Initializing..."));
     println();
 
-    pinMode(dcf77_monitor_pin, OUTPUT);
-    pinMode(dcf77_sample_pin, dcf77_pin_mode);
-    pinMode(dcf77_signal_good_indicator_pin, OUTPUT);
-    digitalWrite(dcf77_signal_good_indicator_pin, LOW);
+    pinMode(WWVB_monitor_pin, OUTPUT);
+    pinMode(WWVB_sample_pin, WWVB_pin_mode);
+    pinMode(WWVB_signal_good_indicator_pin, OUTPUT);
+    digitalWrite(WWVB_signal_good_indicator_pin, LOW);
 
     DCF77_Clock::setup();
     DCF77_Clock::set_input_provider(sample_input_pin);
@@ -133,7 +133,7 @@ void loop() {
                                                             : '*'  // crystal clock
         );
 
-        digitalWrite(dcf77_signal_good_indicator_pin, state >= Clock::locked);
+        digitalWrite(WWVB_signal_good_indicator_pin, state >= Clock::locked);
 
         print(now.uses_summertime? 'S': ' ');
         print(

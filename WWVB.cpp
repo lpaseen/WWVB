@@ -16,7 +16,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see http://www.gnu.org/licenses/
 
-#include "dcf77.h"
+#include "WWVB.h"
 
 namespace Internal { namespace Debug {
     void debug_helper(char data) { sprint(data == 0? 'S': data == 1? '?': data - 2 + '0', 0); }
@@ -868,7 +868,7 @@ namespace Internal {  // DCF77_Encoder
         // summer/wintertime change will always happen
         // at clearly defined hours
         // http://www.gesetze-im-internet.de/sozv/__2.html
-        // in doubt have a look here: http://www.dcf77logs.de/
+        // in doubt have a look here: http://www.WWVBlogs.de/
         if (day.val < 0x25 || get_weekday() != 0) {
             // timezone change may only happen at the last sunday of march / october
             // the last sunday is always somewhere in [25-31]
@@ -929,7 +929,7 @@ namespace Internal {  // DCF77_Encoder
             increment(minute);
         } else if (minute.val == 0x59) {
             minute.val = 0x00;
-            // in doubt have a look here: http://www.dcf77logs.de/
+            // in doubt have a look here: http://www.WWVBlogs.de/
             if (timezone_change_scheduled && !uses_summertime && hour.val == 0x01) {
                 // Wintertime --> Summertime happens at 01:00 UTC == 02:00 CET == 03:00 CEST,
                 // the clock must be advanced from 01:59 CET to 03:00 CEST

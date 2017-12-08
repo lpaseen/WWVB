@@ -16,17 +16,17 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see http://www.gnu.org/licenses/
 
-#include <dcf77.h>
+#include <WWVB.h>
 #include <avr/eeprom.h>
 
-const uint8_t dcf77_analog_sample_pin = 5;
-const uint8_t dcf77_sample_pin = A5;  // A5 == d19
-const uint8_t dcf77_inverted_samples = 1;
-const uint8_t dcf77_analog_samples = 1;
-// const uint8_t dcf77_pin_mode = INPUT;  // disable internal pull up
-const uint8_t dcf77_pin_mode = INPUT_PULLUP;  // enable internal pull up
+const uint8_t WWVB_analog_sample_pin = 5;
+const uint8_t WWVB_sample_pin = A5;  // A5 == d19
+const uint8_t WWVB_inverted_samples = 1;
+const uint8_t WWVB_analog_samples = 1;
+// const uint8_t WWVB_pin_mode = INPUT;  // disable internal pull up
+const uint8_t WWVB_pin_mode = INPUT_PULLUP;  // enable internal pull up
 
-const uint8_t dcf77_monitor_pin = A4;  // A4 == d18
+const uint8_t WWVB_monitor_pin = A4;  // A4 == d18
 
 // will take pins 2-17 for time switch output
 const uint8_t time_switch_channel_0_pin = 2;
@@ -641,10 +641,10 @@ namespace ISR {
     uint8_t sample_input_pin() {
         ++tick;
         const uint8_t sampled_data =
-        dcf77_inverted_samples ^ (dcf77_analog_samples? (analogRead(dcf77_analog_sample_pin) > 200)
-                                                      : digitalRead(dcf77_sample_pin));
+        WWVB_inverted_samples ^ (WWVB_analog_samples? (analogRead(WWVB_analog_sample_pin) > 200)
+                                                      : digitalRead(WWVB_sample_pin));
 
-        digitalWrite(dcf77_monitor_pin, sampled_data);
+        digitalWrite(WWVB_monitor_pin, sampled_data);
         return sampled_data;
     }
 
@@ -1343,8 +1343,8 @@ uint8_t lock_progress() {
 }
 
 void setup() {
-    pinMode(dcf77_monitor_pin, OUTPUT);
-    pinMode(dcf77_sample_pin, dcf77_pin_mode);
+    pinMode(WWVB_monitor_pin, OUTPUT);
+    pinMode(WWVB_sample_pin, WWVB_pin_mode);
 
     for (uint8_t channel_pin = time_switch_channel_0_pin; channel_pin <time_switch_channel_0_pin+16; ++channel_pin) {
         pinMode(channel_pin, OUTPUT);
@@ -1362,11 +1362,11 @@ void setup() {
     Serial.println(F("(c) Udo Klein 2016"));
     Serial.println(F("www.blinkenlight.net"));
     Serial.println();
-    Serial.print(F("Sample Pin:    ")); Serial.println(dcf77_sample_pin);
-    Serial.print(F("Sample Pin Mode: ")); Serial.println(dcf77_pin_mode);
-    Serial.print(F("Inverted Mode: ")); Serial.println(dcf77_inverted_samples);
-    Serial.print(F("Analog Mode:   ")); Serial.println(dcf77_analog_samples);
-    Serial.print(F("Monitor Pin:   ")); Serial.println(dcf77_monitor_pin);
+    Serial.print(F("Sample Pin:    ")); Serial.println(WWVB_sample_pin);
+    Serial.print(F("Sample Pin Mode: ")); Serial.println(WWVB_pin_mode);
+    Serial.print(F("Inverted Mode: ")); Serial.println(WWVB_inverted_samples);
+    Serial.print(F("Analog Mode:   ")); Serial.println(WWVB_analog_samples);
+    Serial.print(F("Monitor Pin:   ")); Serial.println(WWVB_monitor_pin);
     Serial.print(F("Drift Adjust:  ")); Serial.println(Internal::Generic_1_kHz_Generator::read_adjustment());
     Serial.println();
     Serial.println();

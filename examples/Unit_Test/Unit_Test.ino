@@ -36,7 +36,7 @@
     #error
 #endif
 
-#include <dcf77.h>
+#include <WWVB.h>
 
 const bool stop_on_first_error = false;
 const bool verbose = false;

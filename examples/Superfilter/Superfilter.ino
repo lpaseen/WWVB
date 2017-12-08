@@ -16,19 +16,19 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see http://www.gnu.org/licenses/
 
-#include <dcf77.h>
+#include <WWVB.h>
 /*
 const uint8_t pon_pin  = 51; // connect pon to ground !!!
 const uint8_t data_pin = 19;
 const uint8_t gnd_pin  = 51;
 const uint8_t vcc_pin  = 49;
 */
-const uint8_t dcf77_analog_samples = false;
-const uint8_t dcf77_analog_sample_pin = 5;
-const uint8_t dcf77_sample_pin = 19; // A5
-const uint8_t dcf77_inverted_samples = 0;
-// const uint8_t dcf77_pin_mode = INPUT;  // disable internal pull up
-const uint8_t dcf77_pin_mode = INPUT_PULLUP;  // enable internal pull up
+const uint8_t WWVB_analog_samples = false;
+const uint8_t WWVB_analog_sample_pin = 5;
+const uint8_t WWVB_sample_pin = 19; // A5
+const uint8_t WWVB_inverted_samples = 0;
+// const uint8_t WWVB_pin_mode = INPUT;  // disable internal pull up
+const uint8_t WWVB_pin_mode = INPUT_PULLUP;  // enable internal pull up
 
 #if defined(__AVR__)
 #define ledpin(led) (led)
@@ -36,27 +36,27 @@ const uint8_t dcf77_pin_mode = INPUT_PULLUP;  // enable internal pull up
 #define ledpin(led) (led<14? led: led+(54-14))
 #endif
 
-const uint8_t dcf77_monitor_pin = ledpin(18); // A4
+const uint8_t WWVB_monitor_pin = ledpin(18); // A4
 
 const bool provide_filtered_output = true;
-const uint8_t dcf77_filtered_pin          = ledpin(12);
-const uint8_t dcf77_inverted_filtered_pin = ledpin(11);
-const uint8_t dcf77_filter_diff_pin       = ledpin(7);
+const uint8_t WWVB_filtered_pin          = ledpin(12);
+const uint8_t WWVB_inverted_filtered_pin = ledpin(11);
+const uint8_t WWVB_filter_diff_pin       = ledpin(7);
 
 const bool provide_semi_synthesized_output = true;
-const uint8_t dcf77_semi_synthesized_pin          = ledpin(16);
-const uint8_t dcf77_inverted_semi_synthesized_pin = ledpin(15);
-const uint8_t dcf77_semi_synthesized_diff_pin     = ledpin(14);
+const uint8_t WWVB_semi_synthesized_pin          = ledpin(16);
+const uint8_t WWVB_inverted_semi_synthesized_pin = ledpin(15);
+const uint8_t WWVB_semi_synthesized_diff_pin     = ledpin(14);
 
 const bool provide_synthesized_output = true;
-const uint8_t dcf77_synthesized_pin          = ledpin(6);
-const uint8_t dcf77_inverted_synthesized_pin = ledpin(5);
-const uint8_t dcf77_synthesized_diff_pin     = ledpin(4);
+const uint8_t WWVB_synthesized_pin          = ledpin(6);
+const uint8_t WWVB_inverted_synthesized_pin = ledpin(5);
+const uint8_t WWVB_synthesized_diff_pin     = ledpin(4);
 
-const uint8_t dcf77_second_pulse_pin = ledpin(10);
+const uint8_t WWVB_second_pulse_pin = ledpin(10);
 
 
-const uint8_t dcf77_signal_good_indicator_pin = ledpin(13);
+const uint8_t WWVB_signal_good_indicator_pin = ledpin(13);
 
 volatile uint16_t ms_counter = 0;
 volatile Internal::DCF77::tick_t tick = Internal::DCF77::undefined;
@@ -134,14 +134,14 @@ uint8_t sample_input_pin() {
     const uint8_t clock_state = DCF77_Clock::get_clock_state();
     const uint8_t sampled_data =
         #if defined(__AVR__)
-        dcf77_inverted_samples ^ (dcf77_analog_samples? (analogRead(dcf77_analog_sample_pin) > 200)
-                                                      : digitalRead(dcf77_sample_pin));
+        WWVB_inverted_samples ^ (WWVB_analog_samples? (analogRead(WWVB_analog_sample_pin) > 200)
+                                                      : digitalRead(WWVB_sample_pin));
         #else
-        dcf77_inverted_samples ^ digitalRead(dcf77_sample_pin);
+        WWVB_inverted_samples ^ digitalRead(WWVB_sample_pin);
         #endif
 
-    digitalWrite(dcf77_monitor_pin, sampled_data);
-    digitalWrite(dcf77_second_pulse_pin, ms_counter < 500 && clock_state >= Clock::locked);
+    digitalWrite(WWVB_monitor_pin, sampled_data);
+    digitalWrite(WWVB_second_pulse_pin, ms_counter < 500 && clock_state >= Clock::locked);
 
     const uint8_t synthesized_signal =
         tick == Internal::DCF77::long_tick  ? ms_counter < 200:
@@ -155,21 +155,21 @@ uint8_t sample_input_pin() {
                                               ms_counter <100;
 
     set_output<provide_filtered_output, Clock::locked,
-              dcf77_filtered_pin, dcf77_inverted_filtered_pin, dcf77_filter_diff_pin>
+              WWVB_filtered_pin, WWVB_inverted_filtered_pin, WWVB_filter_diff_pin>
               (clock_state, sampled_data, synthesized_signal);
 
     set_output<provide_semi_synthesized_output, Clock::unlocked,
-               dcf77_semi_synthesized_pin, dcf77_inverted_semi_synthesized_pin, dcf77_semi_synthesized_diff_pin>
+               WWVB_semi_synthesized_pin, WWVB_inverted_semi_synthesized_pin, WWVB_semi_synthesized_diff_pin>
                (clock_state, sampled_data, synthesized_signal);
 
     set_output<provide_synthesized_output, Clock::free,
-               dcf77_synthesized_pin, dcf77_inverted_synthesized_pin, dcf77_synthesized_diff_pin>
+               WWVB_synthesized_pin, WWVB_inverted_synthesized_pin, WWVB_synthesized_diff_pin>
                (clock_state, sampled_data, synthesized_signal);
 
     ms_counter+= (ms_counter < 1000);
 
     scope_1.process_one_sample(sampled_data);
-    scope_2.process_one_sample(digitalRead(dcf77_synthesized_pin));
+    scope_2.process_one_sample(digitalRead(WWVB_synthesized_pin));
 
     return sampled_data;
 }
@@ -186,7 +186,7 @@ void output_handler(const Clock::time_t &decoded_time) {
     //                      blink 1s on 3s off if signal is very poor
     //                      always off if signal is bad
     const uint8_t clock_state = DCF77_Clock::get_clock_state();
-    digitalWrite(dcf77_signal_good_indicator_pin,
+    digitalWrite(WWVB_signal_good_indicator_pin,
                  clock_state >= Clock::locked  ? 1:
                  clock_state == Clock::unlocked? (decoded_time.second.digit.lo & 0x03) != 0:
                  clock_state == Clock::free    ? (decoded_time.second.digit.lo & 0x03) == 0:
@@ -223,41 +223,41 @@ void output_splash_screen() {
     Serial.println(F("(c) 2016 Udo Klein"));
     Serial.println(F("www.blinkenlight.net"));
     Serial.println();
-    Serial.print(F("Sample Pin:               ")); Serial.println(dcf77_sample_pin);
-    Serial.print(F("Sample Pin Mode:          ")); Serial.println(dcf77_pin_mode);
-    Serial.print(F("Inverted Mode:            ")); Serial.println(dcf77_inverted_samples);
+    Serial.print(F("Sample Pin:               ")); Serial.println(WWVB_sample_pin);
+    Serial.print(F("Sample Pin Mode:          ")); Serial.println(WWVB_pin_mode);
+    Serial.print(F("Inverted Mode:            ")); Serial.println(WWVB_inverted_samples);
     #if defined(__AVR__)
-    Serial.print(F("Analog Mode:              ")); Serial.println(dcf77_analog_samples);
+    Serial.print(F("Analog Mode:              ")); Serial.println(WWVB_analog_samples);
     #endif
-    Serial.print(F("Monitor Pin:              ")); Serial.println(dcf77_monitor_pin);
+    Serial.print(F("Monitor Pin:              ")); Serial.println(WWVB_monitor_pin);
     Serial.println();
 
     if (provide_filtered_output) {
         Serial.println(F("Filtered Output"));
-        Serial.print(F("    Filtered Pin:         ")); Serial.println(dcf77_filtered_pin);
-        Serial.print(F("    Diff Pin:             ")); Serial.println(dcf77_filter_diff_pin);
-        Serial.print(F("    Inverse Filtered Pin: ")); Serial.println(dcf77_inverted_filtered_pin);
+        Serial.print(F("    Filtered Pin:         ")); Serial.println(WWVB_filtered_pin);
+        Serial.print(F("    Diff Pin:             ")); Serial.println(WWVB_filter_diff_pin);
+        Serial.print(F("    Inverse Filtered Pin: ")); Serial.println(WWVB_inverted_filtered_pin);
         Serial.println();
     }
 
     if (provide_semi_synthesized_output) {
         Serial.println(F("Semi Synthesized Output"));
-        Serial.print(F("    Filtered Pin:         ")); Serial.println(dcf77_semi_synthesized_pin);
-        Serial.print(F("    Diff Pin:             ")); Serial.println(dcf77_semi_synthesized_diff_pin);
-        Serial.print(F("    Inverse Filtered Pin: ")); Serial.println(dcf77_inverted_semi_synthesized_pin);
+        Serial.print(F("    Filtered Pin:         ")); Serial.println(WWVB_semi_synthesized_pin);
+        Serial.print(F("    Diff Pin:             ")); Serial.println(WWVB_semi_synthesized_diff_pin);
+        Serial.print(F("    Inverse Filtered Pin: ")); Serial.println(WWVB_inverted_semi_synthesized_pin);
         Serial.println();
     }
 
     if (provide_synthesized_output) {
         Serial.println(F("Synthesized Output"));
-        Serial.print(F("    Filtered Pin:         ")); Serial.println(dcf77_synthesized_pin);
-        Serial.print(F("    Diff Pin:             ")); Serial.println(dcf77_synthesized_diff_pin);
-        Serial.print(F("    Inverse Filtered Pin: ")); Serial.println(dcf77_inverted_synthesized_pin);
+        Serial.print(F("    Filtered Pin:         ")); Serial.println(WWVB_synthesized_pin);
+        Serial.print(F("    Diff Pin:             ")); Serial.println(WWVB_synthesized_diff_pin);
+        Serial.print(F("    Inverse Filtered Pin: ")); Serial.println(WWVB_inverted_synthesized_pin);
         Serial.println();
     }
 
-    Serial.print(F("Second Pulse Pin:         ")); Serial.println(dcf77_second_pulse_pin);
-    Serial.print(F("Signal Good Pin:          ")); Serial.println(dcf77_signal_good_indicator_pin);
+    Serial.print(F("Second Pulse Pin:         ")); Serial.println(WWVB_second_pulse_pin);
+    Serial.print(F("Signal Good Pin:          ")); Serial.println(WWVB_signal_good_indicator_pin);
 
     Serial.println();
 
@@ -268,27 +268,27 @@ void output_splash_screen() {
 
 void setup_pins() {
     if (provide_filtered_output) {
-        pinMode(dcf77_filtered_pin, OUTPUT);
-        pinMode(dcf77_filter_diff_pin, OUTPUT);
-        pinMode(dcf77_inverted_filtered_pin, OUTPUT);
+        pinMode(WWVB_filtered_pin, OUTPUT);
+        pinMode(WWVB_filter_diff_pin, OUTPUT);
+        pinMode(WWVB_inverted_filtered_pin, OUTPUT);
     }
 
     if (provide_semi_synthesized_output) {
-        pinMode(dcf77_semi_synthesized_pin, OUTPUT);
-        pinMode(dcf77_semi_synthesized_diff_pin, OUTPUT);
-        pinMode(dcf77_inverted_semi_synthesized_pin, OUTPUT);
+        pinMode(WWVB_semi_synthesized_pin, OUTPUT);
+        pinMode(WWVB_semi_synthesized_diff_pin, OUTPUT);
+        pinMode(WWVB_inverted_semi_synthesized_pin, OUTPUT);
     }
 
     if (provide_synthesized_output) {
-        pinMode(dcf77_synthesized_pin, OUTPUT);
-        pinMode(dcf77_synthesized_diff_pin, OUTPUT);
-        pinMode(dcf77_inverted_synthesized_pin, OUTPUT);
+        pinMode(WWVB_synthesized_pin, OUTPUT);
+        pinMode(WWVB_synthesized_diff_pin, OUTPUT);
+        pinMode(WWVB_inverted_synthesized_pin, OUTPUT);
     }
 
-    pinMode(dcf77_monitor_pin, OUTPUT);
-    pinMode(dcf77_signal_good_indicator_pin, OUTPUT);
-    pinMode(dcf77_second_pulse_pin, OUTPUT);
-    pinMode(dcf77_sample_pin, dcf77_pin_mode);
+    pinMode(WWVB_monitor_pin, OUTPUT);
+    pinMode(WWVB_signal_good_indicator_pin, OUTPUT);
+    pinMode(WWVB_second_pulse_pin, OUTPUT);
+    pinMode(WWVB_sample_pin, WWVB_pin_mode);
 }
 
 void setup_clock() {

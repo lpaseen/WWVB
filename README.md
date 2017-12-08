@@ -1,3 +1,34 @@
+********************************************************************************************************************************
+********************************************************************************************************************************
+
+
+Work in progress - just started !!!!
+
+This is not yet working code!
+
+
+
+This is a fork of the DCF77 library used for the german radio time with the intent
+to convert it to WWVB north america/colorado radio time
+
+
+Work is just started so don't expect anything to work!
+
+
+
+
+
+
+
+
+********************************************************************************************************************************
+********************************************************************************************************************************
+
+
+
+
+
+
 # dcf77 library
 
 [![GitHub license](https://img.shields.io/badge/license-AGPL-blue.svg)](https://raw.githubusercontent.com/udoklein/dcf77/master/LICENSE)

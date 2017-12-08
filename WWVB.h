@@ -16,8 +16,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see http://www.gnu.org/licenses/
 
-#ifndef dcf77_h
-#define dcf77_h
+#ifndef WWVB_h
+#define WWVB_h
 
 
 #define DCF77_MAJOR_VERSION 3
@@ -159,7 +159,7 @@ struct Configuration {
     // You may find out your compiler version by executing 'avr-gcc --version'
 
     // Visit the compatibility section here:
-    //     http://blog.blinkenlight.net/experiments/dcf77/dcf77-library/
+    //     http://blog.blinkenlight.net/experiments/WWVB/WWVB-library/
     // for more details.
     #error Outdated compiler version < 4.5.3
     #error Absolute minimum recommended version is avr-gcc 4.5.3.
@@ -496,7 +496,7 @@ namespace Internal {
         // Die Zeitinformation wird immer 1 Minute im Vorraus übertragen. D.h. nach der Syncmarke hat
         // man die aktuelle Zeit
 
-        // http://www.dcf77logs.de/SpecialFiles.aspx
+        // http://www.WWVBlogs.de/SpecialFiles.aspx
 
         // Schaltsekunden werden in Deutschland von der Physikalisch-Technischen Bundesanstalt festgelegt,
         // die allerdings dazu nur die international vom International Earth Rotation and Reference Systems

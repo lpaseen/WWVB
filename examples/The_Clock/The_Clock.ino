@@ -16,13 +16,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see http://www.gnu.org/licenses/
 
-#include <dcf77.h>
+#include <WWVB.h>
 
 // which pin the clock module is connected to
-const uint8_t dcf77_analog_sample_pin = 5;
-const uint8_t dcf77_sample_pin = 19; // A5
-// const uint8_t dcf77_pin_mode = INPUT;  // disable internal pull up
-const uint8_t dcf77_pin_mode = INPUT_PULLUP;  // enable internal pull up
+const uint8_t WWVB_analog_sample_pin = 5;
+const uint8_t WWVB_sample_pin = 19; // A5
+// const uint8_t WWVB_pin_mode = INPUT;  // disable internal pull up
+const uint8_t WWVB_pin_mode = INPUT_PULLUP;  // enable internal pull up
 
 
 // Automatic polarity detection reduces noise tolerance.
@@ -30,26 +30,26 @@ const uint8_t dcf77_pin_mode = INPUT_PULLUP;  // enable internal pull up
 // and provide the proper sampling polarity.
 //#define auto_detect_sample_polarity 1
 #ifndef auto_detect_sample_polarity
-const uint8_t dcf77_inverted_samples = 1;
+const uint8_t WWVB_inverted_samples = 1;
 #endif
 
 // The Blinkenlighty requires 1 this because the input
 // pins are loaded with LEDs. All others should prefer
 // setting this to 0 as this reduces interrupt contention.
-const uint8_t dcf77_analog_samples = 1;
+const uint8_t WWVB_analog_samples = 1;
 
 // which pin to use for monitor output
-const uint8_t dcf77_monitor_pin = 18;  // A4
+const uint8_t WWVB_monitor_pin = 18;  // A4
 
 // which pins to use for monitoring lightshow
 const uint8_t lower_output_pin = 2;
 const uint8_t upper_output_pin = 17;
 
-const uint8_t dcf77_rolling_monitor_lower_pin = 4;
-const uint8_t dcf77_rolling_monitor_upper_pin = 13;
+const uint8_t WWVB_rolling_monitor_lower_pin = 4;
+const uint8_t WWVB_rolling_monitor_upper_pin = 13;
 
 uint8_t counter = 0;
-uint8_t rolling_pin = dcf77_rolling_monitor_lower_pin;
+uint8_t rolling_pin = WWVB_rolling_monitor_lower_pin;
 
 
 void reset_output_pins() {
@@ -68,8 +68,8 @@ void setup_output_pins() {
 uint8_t sample_input_pin() {
     #ifndef auto_detect_sample_polarity
     const uint8_t sampled_data =
-        dcf77_inverted_samples ^ (dcf77_analog_samples? (analogRead(dcf77_analog_sample_pin) > 200):
-                                                        digitalRead(dcf77_sample_pin));
+        WWVB_inverted_samples ^ (WWVB_analog_samples? (analogRead(WWVB_analog_sample_pin) > 200):
+                                                        digitalRead(WWVB_sample_pin));
     #else
     const int32_t int32_max = 0x7fffffffL;
     const int32_t int32_min = -int32_max-1L;
@@ -77,15 +77,15 @@ uint8_t sample_input_pin() {
     static int32_t high_samples_minus_low_samples = 0;
 
     const uint8_t data =
-        dcf77_analog_samples? analogRead(dcf77_analog_sample_pin) > 200
-                            : digitalRead(dcf77_sample_pin);
+        WWVB_analog_samples? analogRead(WWVB_analog_sample_pin) > 200
+                            : digitalRead(WWVB_sample_pin);
 
     high_samples_minus_low_samples += data > 0? +(high_samples_minus_low_samples < int32_max):
                                                 -(high_samples_minus_low_samples > int32_min);
 
     const uint8_t sampled_data = data ^ (high_samples_minus_low_samples > 0);
     #endif
-    digitalWrite(dcf77_monitor_pin, sampled_data);
+    digitalWrite(WWVB_monitor_pin, sampled_data);
     return sampled_data;
 }
 
@@ -125,7 +125,7 @@ namespace MaxTicks {
 
 namespace Ticks {
     void output_handler(const Clock::time_t &decoded_time) {
-        rolling_pin = dcf77_rolling_monitor_lower_pin;
+        rolling_pin = WWVB_rolling_monitor_lower_pin;
         counter = 0;
     }
 
@@ -139,7 +139,7 @@ namespace Ticks {
         if (counter < 20) {
             ++counter;
         } else {
-            rolling_pin = rolling_pin < dcf77_rolling_monitor_upper_pin? rolling_pin + 1: dcf77_rolling_monitor_lower_pin;
+            rolling_pin = rolling_pin < WWVB_rolling_monitor_upper_pin? rolling_pin + 1: WWVB_rolling_monitor_lower_pin;
             counter = 1;
         }
 
@@ -297,8 +297,8 @@ void help() {
 }
 
 void setup() {
-    pinMode(dcf77_monitor_pin, OUTPUT);
-    pinMode(dcf77_sample_pin, dcf77_pin_mode);
+    pinMode(WWVB_monitor_pin, OUTPUT);
+    pinMode(WWVB_sample_pin, WWVB_pin_mode);
 
     setup_output_pins();
 
@@ -312,16 +312,16 @@ void setup() {
     Serial.println(F("(c) Udo Klein 2016"));
     Serial.println(F("www.blinkenlight.net"));
     Serial.println();
-    Serial.print(F("Sample Pin:      ")); Serial.println(dcf77_sample_pin);
-    Serial.print(F("Sample Pin Mode: ")); Serial.println(dcf77_pin_mode);
+    Serial.print(F("Sample Pin:      ")); Serial.println(WWVB_sample_pin);
+    Serial.print(F("Sample Pin Mode: ")); Serial.println(WWVB_pin_mode);
     #ifndef auto_detect_sample_polarity
-    Serial.print(F("Inverted Mode:   ")); Serial.println(dcf77_inverted_samples);
+    Serial.print(F("Inverted Mode:   ")); Serial.println(WWVB_inverted_samples);
     #else
     Serial.println(F("Automatic Detection Mode "));
     #endif
 
-    Serial.print(F("Analog Mode:     ")); Serial.println(dcf77_analog_samples);
-    Serial.print(F("Monitor Pin:     ")); Serial.println(dcf77_monitor_pin);
+    Serial.print(F("Analog Mode:     ")); Serial.println(WWVB_analog_samples);
+    Serial.print(F("Monitor Pin:     ")); Serial.println(WWVB_monitor_pin);
     Serial.print(F("Drift Adjust:    ")); Serial.println(Internal::Generic_1_kHz_Generator::read_adjustment());
     Serial.println();
     help();
